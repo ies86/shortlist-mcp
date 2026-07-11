@@ -42,17 +42,27 @@ export async function fetchIndex(cat: Categorie) {
   return res.json()
 }
 
-type Provider = { provider: string, price?: number, pricePerGB?: number, referencePlanUSD?: number, url?: string, basis?: string, billing?: string }
+type Provider = { provider: string, slug?: string, price?: number, pricePerGB?: number, referencePlanUSD?: number, url?: string, basis?: string, billing?: string, rating?: number, bestFor?: string }
 
 export function normaliseer(cat: Categorie, payload: Record<string, unknown>) {
-  const providers = ((payload.providers ?? []) as Provider[]).map(p => ({
-    provider: p.provider,
-    price: p.pricePerGB ?? p.price,
-    ...(p.referencePlanUSD !== undefined ? { referencePlanUSD: p.referencePlanUSD } : {}),
-    ...(p.basis ? { pricingBasis: p.basis } : {}),
-    ...(p.billing ? { billing: p.billing } : {}),
-    ...(p.url ? { detailsUrl: p.url } : {}),
-  })).sort((a, b) => (a.price ?? 0) - (b.price ?? 0))
+  const providers = ((payload.providers ?? []) as Provider[]).map(p => {
+    // buyUrl = de canonieke uitgaande link per aanbieder (site-redirect /api/go/<slug>):
+    // stabiel, meetbaar en draagt de partnerkoppeling. Slug uit de payload,
+    // anders afgeleid uit de tools-URL; ontbreken beide (bv. recruitment via
+    // GitHub-raw) dan geen buyUrl.
+    const goSlug = p.slug ?? p.url?.match(/\/tools\/([^/?#]+)/)?.[1]
+    return {
+      provider: p.provider,
+      price: p.pricePerGB ?? p.price,
+      ...(p.rating !== undefined ? { rating: p.rating } : {}),
+      ...(p.bestFor ? { bestFor: p.bestFor } : {}),
+      ...(p.referencePlanUSD !== undefined ? { referencePlanUSD: p.referencePlanUSD } : {}),
+      ...(p.basis ? { pricingBasis: p.basis } : {}),
+      ...(p.billing ? { billing: p.billing } : {}),
+      ...(p.url ? { detailsUrl: p.url } : {}),
+      ...(goSlug ? { buyUrl: `${cat.comparisonUrl}/api/go/${goSlug}` } : {}),
+    }
+  }).sort((a, b) => (a.price ?? 0) - (b.price ?? 0))
   return {
     category: cat.slug,
     name: cat.name,
