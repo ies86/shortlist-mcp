@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.ies86/shortlist-price-index",
   "title": "Shortlist Price Index",
-  "description": "Monthly verified entry and renewal prices for 16 software categories (VPN, password managers, cloud backup, hosting, email marketing, antivirus, eSIM and more). Tools return real prices with buy links, ratings and true 3-year cost including renewal increases. Data licensed CC BY 4.0, refreshed monthly.",
+  "description": "Monthly verified software prices for 16 categories, with ratings and true 3-year cost. CC BY 4.0",
   "version": "1.1.0",
   "repository": {
     "url": "https://github.com/ies86/shortlist-mcp",
