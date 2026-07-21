@@ -13,11 +13,11 @@ const handler = createMcpHandler(
   (server) => {
     server.tool(
       'list_categories',
-      'List all software price categories tracked by the Shortlist Price Index: monthly verified entry prices (lowest paid plan per provider) across 11 US/global categories and 5 Dutch (EUR) categories. Returns slugs to use with get_price_index and get_cheapest.',
+      'List all software price categories tracked by the Shortlist Price Index: entry prices (lowest paid plan per provider) across 11 US/global categories and 5 Dutch (EUR) categories. Returns slugs to use with get_price_index and get_cheapest.',
       {},
       async () => alsTekst({
         categories: CATEGORIES.map(c => ({ slug: c.slug, name: c.name, unit: c.unit, currency: c.currency, comparisonUrl: c.comparisonUrl })),
-        note: 'Prices are entry-level list prices, verified monthly since June 2026. ' + LICENSE_NOTE,
+        note: 'Prices are entry-level list prices, compiled from each provider\'s public pricing page and republished monthly. Three categories (VPN, web hosting, cloud backup) are additionally measured by an automated pipeline that archives its source pages; the others are hand-curated. ' + LICENSE_NOTE,
       })
     )
 

@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.ies86/shortlist-price-index",
   "title": "Shortlist Price Index",
-  "description": "Monthly verified software prices for 16 categories, with ratings and true 3-year cost. CC BY 4.0",
-  "version": "1.1.1",
+  "description": "Software entry prices for 16 categories, with ratings and true 3-year cost. CC BY 4.0",
+  "version": "1.2.0",
   "repository": {
     "url": "https://github.com/ies86/shortlist-mcp",
     "source": "github"
