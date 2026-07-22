@@ -2,6 +2,7 @@
   "name": "shortlist-mcp",
   "version": "1.0.0",
   "private": true,
+  "license": "MIT",
   "description": "MCP server exposing the Shortlist Price Index: software entry prices across 16 categories, CC BY 4.0",
   "scripts": {
     "dev": "next dev",
