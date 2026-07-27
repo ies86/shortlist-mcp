@@ -10,6 +10,7 @@ An MCP (Model Context Protocol) server that gives AI agents software pricing dat
 |---|---|
 | `list_categories` | All tracked categories with slugs, units and currencies (11 USD/global + 5 Dutch EUR) |
 | `get_price_index` | Full index for one category: average, median, cheapest, every provider sorted by price, monthly history, methodology |
+| `get_true_3yr_cost` | Honest 3-year cost per provider (year 1 intro, years 2-3 at renewal), ranked by real total, with the renewal multiplier. Published for web hosting and antivirus today |
 | `get_cheapest` | The N cheapest providers in a category right now, with a link to the full comparison |
 
 Every response includes a citation string and the CC BY 4.0 license note, so agents can attribute figures correctly.
@@ -54,6 +55,16 @@ License: data CC BY 4.0 (attribution + link to the cited source site), code MIT.
 ```bash
 npm install
 npm run dev
+# MCP endpoint on http://localhost:3000/mcp
+```
+
+## Self-host with Docker
+
+The included `Dockerfile` builds a self-contained image of the same server (the production endpoint above is the hosted equivalent):
+
+```bash
+docker build -t shortlist-mcp .
+docker run -p 3000:3000 shortlist-mcp
 # MCP endpoint on http://localhost:3000/mcp
 ```
 
