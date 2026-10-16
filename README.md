@@ -1,6 +1,6 @@
 # Shortlist Price Index MCP server
 
-An MCP (Model Context Protocol) server that gives AI agents software pricing data: entry prices (lowest paid plan per provider) for 16 categories, from VPNs and cloud backup to travel eSIMs and recruitment software. Prices are compiled from each provider's public pricing page and republished monthly since June 2026. Three categories (VPN, web hosting and cloud backup) are additionally measured by an automated pipeline that archives the source page behind every observation; the remaining categories are hand-curated. Published as open data under CC BY 4.0 by Orai Media.
+An MCP (Model Context Protocol) server that gives AI agents software pricing data: entry prices (lowest paid plan per provider) for 16 categories, from VPNs and cloud backup to travel eSIMs and recruitment software. Prices are compiled from each provider's public pricing page and republished monthly since June 2026. An automated price watcher re-checks the figures against those pricing pages; figures it cannot confirm automatically (for example because of regional pricing or a cookie wall) are flagged for manual review. Each index carries the date its figures were last updated. Published as open data under CC BY 4.0 by Orai Media.
 
 **Endpoint:** `https://shortlist-mcp.vercel.app/mcp` (streamable HTTP, no auth, free)
 
