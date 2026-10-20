@@ -102,7 +102,7 @@ const handler = createMcpHandler(
     )
   },
   {
-    serverInfo: { name: 'shortlist-price-index', version: '1.2.1' },
+    serverInfo: { name: 'shortlist-price-index', version: '1.2.2' },
   },
   {
     basePath: '',

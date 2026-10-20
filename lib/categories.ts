@@ -8,7 +8,6 @@ export type Categorie = {
   citation: string
 }
 
-const RAW = 'https://raw.githubusercontent.com/ies86/shortlist-price-index/main'
 
 export const CATEGORIES: Categorie[] = [
   { slug: 'cloud-backup', name: 'Cloud backup', unit: 'USD per month', currency: 'USD', endpoint: 'https://backupshortlist.com/data/price-index.json', comparisonUrl: 'https://backupshortlist.com', citation: 'BackupShortlist Price Index, https://backupshortlist.com/data/price-index' },
@@ -21,7 +20,6 @@ export const CATEGORIES: Categorie[] = [
   { slug: 'vpn', name: 'VPN services', unit: 'USD per month', currency: 'USD', endpoint: 'https://vpnshortlist.com/data/price-index.json', comparisonUrl: 'https://vpnshortlist.com', citation: 'VPNShortlist Price Index, https://vpnshortlist.com/data/price-index' },
   { slug: 'learning-platforms', name: 'Online learning platforms', unit: 'USD per month', currency: 'USD', endpoint: 'https://courseshortlist.com/data/price-index.json', comparisonUrl: 'https://courseshortlist.com', citation: 'CourseShortlist Price Index, https://courseshortlist.com/data/price-index' },
   { slug: 'travel-esim', name: 'Travel eSIMs', unit: 'USD per GB (5 GB / 30-day reference plan)', currency: 'USD', endpoint: 'https://esimshortlist.com/data/esim-price-index.json', comparisonUrl: 'https://esimshortlist.com', citation: 'eSIMShortlist Price Index, https://esimshortlist.com/data/esim-price-index' },
-  { slug: 'recruitment-software', name: 'Recruitment software (ATS)', unit: 'USD per month, single user', currency: 'USD', endpoint: `${RAW}/data/recruitment-software/price-index-current.json`, comparisonUrl: 'https://github.com/ies86/shortlist-price-index/tree/main/data/recruitment-software', citation: 'Shortlist Price Index, Orai Media, https://github.com/ies86/shortlist-price-index' },
   { slug: 'vpn-nl', name: 'VPN-diensten (Netherlands)', unit: 'EUR per maand', currency: 'EUR', endpoint: 'https://kiesvpn.nl/data/price-index.json', comparisonUrl: 'https://kiesvpn.nl', citation: 'KiesVPN Prijsindex, https://kiesvpn.nl/data/price-index' },
   { slug: 'hosting-nl', name: 'Webhosting (Netherlands)', unit: 'EUR per maand', currency: 'EUR', endpoint: 'https://kieshosting.nl/data/price-index.json', comparisonUrl: 'https://kieshosting.nl', citation: 'KiesHosting Prijsindex, https://kieshosting.nl/data/price-index' },
   { slug: 'learning-platforms-nl', name: 'Leerplatformen (Netherlands)', unit: 'EUR per maand', currency: 'EUR', endpoint: 'https://leerplatformkiezer.nl/data/price-index.json', comparisonUrl: 'https://leerplatformkiezer.nl', citation: 'Leerplatformkiezer Prijsindex, https://leerplatformkiezer.nl/data/price-index' },
