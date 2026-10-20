@@ -1,4 +1,10 @@
-import { CATEGORIES } from '../lib/categories'
+import { CATEGORIES, MAX_AGE_DAYS, fetchIndex, isFresh } from '../lib/categories'
+
+// Ververst elk uur, net als de index zelf (fetchIndex cachet een uur).
+export const revalidate = 3600
+
+// Bronpagina's alleen van de actieve sites (status focus of kans in scripts/domeinen.mjs van HET MAINFRAME).
+const NIET_ALS_BRON = /vpnshortlist|kiesvpn|courseshortlist|esimshortlist|github\.com/
 
 const kaart: React.CSSProperties = {
   background: '#fff', border: '1px solid #e7e5e4', borderRadius: 12, padding: '1.25rem 1.5rem', marginBottom: '1.25rem',
@@ -8,16 +14,20 @@ const code: React.CSSProperties = {
   fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 13.5, overflowX: 'auto', whiteSpace: 'pre',
 }
 
-export default function Home() {
+export default async function Home() {
+  const gelezen = await Promise.allSettled(CATEGORIES.map(c => fetchIndex(c)))
+  const actueel = CATEGORIES.filter((_, i) => { const r = gelezen[i]; return r.status === 'fulfilled' && isFresh(r.value) })
+  const bronnen = actueel.filter(c => !NIET_ALS_BRON.test(c.comparisonUrl))
   return (
     <main style={{ maxWidth: 760, margin: '0 auto', padding: '3rem 1.25rem 4rem' }}>
       <p style={{ letterSpacing: 1.5, textTransform: 'uppercase', fontSize: 12, fontWeight: 700, color: '#78716c', marginBottom: 8 }}>Model Context Protocol server</p>
       <h1 style={{ fontSize: 34, lineHeight: 1.15, margin: '0 0 0.75rem' }}>Shortlist Price Index MCP</h1>
       <p style={{ fontSize: 17, lineHeight: 1.6, color: '#44403c', marginBottom: '2rem' }}>
-        Give your AI agent verified, monthly software pricing data. This server exposes the{' '}
+        Give your AI agent current software pricing data. This server exposes the{' '}
         <a href="https://github.com/ies86/shortlist-price-index" style={{ color: '#0f766e', fontWeight: 600 }}>Shortlist Price Index</a>:
-        entry prices (lowest paid plan per provider) for {CATEGORIES.length} categories, verified monthly since June 2026 and
-        published as open data under CC BY 4.0 by Orai Media.
+        entry prices (lowest paid plan per provider) and the true 3-year cost, compiled from each provider&apos;s public
+        pricing page, republished monthly since June 2026 and published as open data under CC BY 4.0 by Orai Media.
+        {' '}{actueel.length} categories are current today.
       </p>
 
       <div style={kaart}>
@@ -29,8 +39,9 @@ export default function Home() {
       <div style={kaart}>
         <h2 style={{ fontSize: 19, margin: '0 0 0.5rem' }}>Tools</h2>
         <ul style={{ margin: 0, paddingLeft: '1.2rem', fontSize: 15.5, lineHeight: 1.7, color: '#44403c' }}>
-          <li><strong>list_categories</strong>: all tracked categories with slugs and units</li>
+          <li><strong>list_categories</strong>: the current categories with slugs, units and the date of the latest update</li>
           <li><strong>get_price_index</strong>: full index for a category (average, median, cheapest, every provider, monthly history, methodology)</li>
+          <li><strong>get_true_3yr_cost</strong>: year 1 at the intro price, years 2 and 3 at renewal, ranked by the real total (web hosting and antivirus)</li>
           <li><strong>get_cheapest</strong>: the N cheapest providers in a category right now</li>
         </ul>
       </div>
@@ -52,8 +63,19 @@ export default function Home() {
       <div style={kaart}>
         <h2 style={{ fontSize: 19, margin: '0 0 0.5rem' }}>Categories</h2>
         <ul style={{ margin: 0, paddingLeft: '1.2rem', fontSize: 15, lineHeight: 1.7, color: '#44403c' }}>
-          {CATEGORIES.map(c => (
+          {actueel.map(c => (
             <li key={c.slug}><code style={{ background: '#f5f5f4', padding: '1px 6px', borderRadius: 4 }}>{c.slug}</code> {c.name} ({c.unit})</li>
+          ))}
+        </ul>
+        <p style={{ fontSize: 14, color: '#57534e', margin: '0.75rem 0 0' }}>A category whose latest index is older than {MAX_AGE_DAYS} days is withheld until its next verified refresh, so no outdated price is quoted.</p>
+      </div>
+
+      <div style={kaart}>
+        <h2 style={{ fontSize: 19, margin: '0 0 0.5rem' }}>Sources</h2>
+        <p style={{ fontSize: 14.5, color: '#57534e', margin: '0 0 0.5rem' }}>Every figure comes from the price index page of the comparison guide that publishes it:</p>
+        <ul style={{ margin: 0, paddingLeft: '1.2rem', fontSize: 15, lineHeight: 1.7, color: '#44403c' }}>
+          {bronnen.map(c => (
+            <li key={c.slug}>{c.name}: <a href={`${c.comparisonUrl}/data/price-index`} style={{ color: '#0f766e' }}>{c.citation.split(',')[0]}</a></li>
           ))}
         </ul>
       </div>

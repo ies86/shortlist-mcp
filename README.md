@@ -1,6 +1,6 @@
 # Shortlist Price Index MCP server
 
-An MCP (Model Context Protocol) server that gives AI agents software pricing data: entry prices (lowest paid plan per provider) for 16 categories, from VPNs and cloud backup to travel eSIMs and recruitment software. Prices are compiled from each provider's public pricing page and republished monthly since June 2026. An automated price watcher re-checks the figures against those pricing pages; figures it cannot confirm automatically (for example because of regional pricing or a cookie wall) are flagged for manual review. Each index carries the date its figures were last updated. Published as open data under CC BY 4.0 by Orai Media.
+An MCP (Model Context Protocol) server that gives AI agents software pricing data: entry prices (lowest paid plan per provider) and the true 3-year cost for categories such as web hosting, SEO tools, cloud backup, antivirus, password managers and email marketing, in USD and for the Dutch market in EUR. Prices are compiled from each provider's public pricing page and republished monthly since June 2026. An automated price watcher re-checks the figures against those pricing pages; figures it cannot confirm automatically (for example because of regional pricing or a cookie wall) are flagged for manual review. Each index carries the date its figures were last updated, and a category whose latest index is older than 35 days is withheld until its next verified refresh, so an agent never quotes an outdated price. Published as open data under CC BY 4.0 by Orai Media.
 
 **Endpoint:** `https://shortlist-mcp.vercel.app/mcp` (streamable HTTP, no auth, free)
 
@@ -8,7 +8,7 @@ An MCP (Model Context Protocol) server that gives AI agents software pricing dat
 
 | Tool | What it does |
 |---|---|
-| `list_categories` | All tracked categories with slugs, units and currencies (11 USD/global + 5 Dutch EUR) |
+| `list_categories` | The categories that are current, with slugs, units, currencies and the date of the latest update |
 | `get_price_index` | Full index for one category: average, median, cheapest, every provider sorted by price, monthly history, methodology |
 | `get_true_3yr_cost` | Honest 3-year cost per provider (year 1 intro, years 2-3 at renewal), ranked by real total, with the renewal multiplier. Published for web hosting and antivirus today |
 | `get_cheapest` | The N cheapest providers in a category right now, with a link to the full comparison |
@@ -36,10 +36,27 @@ claude mcp add --transport http shortlist-prices https://shortlist-mcp.vercel.ap
 
 ## Example questions your agent can now answer
 
-- "What does a VPN cost per month right now, and which three are cheapest?"
-- "Compare travel eSIM prices per GB for a summer trip."
-- "How much does an applicant tracking system cost for a single recruiter?"
+- "What does an SEO tool cost per month right now, and which three are cheapest?"
+- "Which web host is cheapest over three years, once the renewal price kicks in?"
+- "Which antivirus suite costs the least over three years?"
 - "Wat kost een wachtwoordmanager per maand in Nederland?"
+
+## Sources
+
+Every figure comes from the price index page of the comparison guide that publishes it. Each response carries that page as its citation.
+
+| Category | Source |
+|---|---|
+| Cloud backup | [BackupShortlist Price Index](https://backupshortlist.com/data/price-index) |
+| Web hosting | [HostingShortlist Price Index](https://hostingshortlist.com/data/price-index) |
+| SEO tools | [SEOShortlist Price Index](https://seoshortlist.com/data/price-index) |
+| Website builders | [WebsiteShortlist Price Index](https://websiteshortlist.com/data/price-index) |
+| Antivirus | [AntivirusShortlist Price Index](https://antivirusshortlist.com/data/price-index) |
+| Email marketing | [MailShortlist Price Index](https://mailshortlist.com/data/price-index) |
+| Password managers | [PasswordShortlist Price Index](https://passwordshortlist.com/data/price-index) |
+| Web hosting (Netherlands, EUR) | [KiesHosting Prijsindex](https://kieshosting.nl/data/price-index) |
+| Password managers (Netherlands, EUR) | [Wachtwoordkiezer Prijsindex](https://wachtwoordkiezer.nl/data/price-index) |
+| Newsletter tools (Netherlands, EUR) | [Nieuwsbriefkiezer Prijsindex](https://nieuwsbriefkiezer.nl/data/price-index) |
 
 ## Data
 

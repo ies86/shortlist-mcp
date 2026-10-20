@@ -33,6 +33,30 @@ export const SLUGS = CATEGORIES.map(c => c.slug) as [string, ...string[]]
 
 export const LICENSE_NOTE = 'Data license: CC BY 4.0. Free to reuse with attribution and a link to the cited source. Full dataset with monthly history: https://github.com/ies86/shortlist-price-index'
 
+// Versheidspoort (20-10-2026): een index ouder dan MAX_AGE_DAYS wordt niet geserveerd. Huisregel: niets mag ouder dan
+// een maand lijken. De categorie komt vanzelf terug zodra de maandmeting van die site weer slaagt.
+export const MAX_AGE_DAYS = 35
+
+export function ageDays(updated: unknown): number | null {
+  const t = Date.parse(String(updated ?? ''))
+  return Number.isFinite(t) ? Math.floor((Date.now() - t) / 86400000) : null
+}
+
+export function isFresh(payload: Record<string, unknown>): boolean {
+  const age = ageDays(payload.updated)
+  return age !== null && age <= MAX_AGE_DAYS
+}
+
+export function withheld(cat: Categorie, payload: Record<string, unknown>) {
+  return {
+    category: cat.slug,
+    name: cat.name,
+    withheld: true,
+    lastUpdated: payload.updated ?? null,
+    note: `The ${cat.name} index was last updated ${payload.updated ? `on ${payload.updated}` : 'on an unknown date'}, more than ${MAX_AGE_DAYS} days ago. It is withheld until the next verified refresh, so no outdated price is quoted. Use list_categories for the categories that are current.`,
+  }
+}
+
 export async function fetchIndex(cat: Categorie) {
   const res = await fetch(cat.endpoint, {
     headers: { accept: 'application/json' },

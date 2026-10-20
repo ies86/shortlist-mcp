@@ -1,6 +1,6 @@
 import { createMcpHandler } from 'mcp-handler'
 import { z } from 'zod'
-import { CATEGORIES, SLUGS, LICENSE_NOTE, fetchIndex, normaliseer } from '../../lib/categories'
+import { CATEGORIES, SLUGS, LICENSE_NOTE, MAX_AGE_DAYS, fetchIndex, normaliseer, isFresh, withheld } from '../../lib/categories'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -13,12 +13,22 @@ const handler = createMcpHandler(
   (server) => {
     server.tool(
       'list_categories',
-      'List all software price categories tracked by the Shortlist Price Index: entry prices (lowest paid plan per provider) across 11 US/global categories and 5 Dutch (EUR) categories. Returns slugs to use with get_price_index and get_cheapest.',
+      'List the software price categories of the Shortlist Price Index that are current: entry prices (lowest paid plan per provider) for US/global categories in USD and Dutch categories in EUR, each with the date of its latest update. Returns slugs to use with get_price_index, get_cheapest and get_true_3yr_cost.',
       {},
-      async () => alsTekst({
-        categories: CATEGORIES.map(c => ({ slug: c.slug, name: c.name, unit: c.unit, currency: c.currency, comparisonUrl: c.comparisonUrl })),
-        note: 'Prices are entry-level list prices, compiled from each provider\'s public pricing page and republished monthly. Three categories (VPN, web hosting, cloud backup) are additionally measured by an automated pipeline that archives its source pages; the others are hand-curated. ' + LICENSE_NOTE,
-      })
+      async () => {
+        const gelezen = await Promise.allSettled(CATEGORIES.map(c => fetchIndex(c)))
+        const actueel: { slug: string, name: string, unit: string, currency: string, updated: unknown, comparisonUrl: string }[] = []
+        let achtergehouden = 0
+        CATEGORIES.forEach((c, i) => {
+          const r = gelezen[i]
+          if (r.status === 'fulfilled' && isFresh(r.value)) actueel.push({ slug: c.slug, name: c.name, unit: c.unit, currency: c.currency, updated: r.value.updated, comparisonUrl: c.comparisonUrl })
+          else achtergehouden++
+        })
+        return alsTekst({
+          categories: actueel,
+          note: `Prices are entry-level list prices, compiled from each provider's public pricing page and republished monthly. An automated price watcher re-checks them against those pricing pages; figures it cannot confirm automatically are flagged for manual review. Categories whose latest index is older than ${MAX_AGE_DAYS} days are withheld until their next verified refresh${achtergehouden ? ` (${achtergehouden} withheld right now)` : ''}. ` + LICENSE_NOTE,
+        })
+      }
     )
 
     server.tool(
@@ -28,6 +38,7 @@ const handler = createMcpHandler(
       async ({ category }) => {
         const cat = CATEGORIES.find(c => c.slug === category)!
         const payload = await fetchIndex(cat)
+        if (!isFresh(payload)) return alsTekst(withheld(cat, payload))
         return alsTekst({ ...normaliseer(cat, payload), licenseNote: LICENSE_NOTE })
       }
     )
@@ -39,6 +50,7 @@ const handler = createMcpHandler(
       async ({ category }) => {
         const cat = CATEGORIES.find(c => c.slug === category)!
         const payload = await fetchIndex(cat)
+        if (!isFresh(payload)) return alsTekst(withheld(cat, payload))
         const tc = payload.trueCost as { unit?: string, avgRenewalMultiplier?: number, providers?: { provider: string, slug?: string, intro: number, renewal: number, multiplier: number, threeYearTotal: number }[] } | undefined
         if (!tc?.providers?.length) {
           return alsTekst({
@@ -74,6 +86,7 @@ const handler = createMcpHandler(
       async ({ category, top_n }) => {
         const cat = CATEGORIES.find(c => c.slug === category)!
         const payload = await fetchIndex(cat)
+        if (!isFresh(payload)) return alsTekst(withheld(cat, payload))
         const genorm = normaliseer(cat, payload)
         return alsTekst({
           category: genorm.category,
@@ -89,7 +102,7 @@ const handler = createMcpHandler(
     )
   },
   {
-    serverInfo: { name: 'shortlist-price-index', version: '1.1.0' },
+    serverInfo: { name: 'shortlist-price-index', version: '1.2.1' },
   },
   {
     basePath: '',
